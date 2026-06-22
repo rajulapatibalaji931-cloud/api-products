@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Store</title>
+
+<style>
+    body{
+        font-family: Arial;
+        margin: 20px;
+        background-color: #69c265;
+    }
+
+    h1, h2{
+        text-align: center;
+    }
+    .search-container{
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 10px 0;
+    }
+
+    #searchBar{
+        width: 400px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #90cd85;
+        border-radius: 5px;
+    }
+
+        padding: 10px 20px;
+        font-size: 16px;
+        
+        color: green;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #searchBtn:hover{
+        background-color: #96e390;
+    }
+
+   
+    #featuredProducts,
+    #products{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 250px));
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+    .card{
+        background: rgb(174, 223, 158);
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        transition: transform 0.3s;
+    }
+
+    .card:hover{
+        transform: translateY(-5px);
+    }
+
+    .card img{
+        width: 60%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .card h3{
+        margin-top: 10px;
+        font-size: 18px;
+    }
+
+    .price{
+        color: green;
+        font-weight: bold;
+        font-size: 18px;
+    }
+    #productDetails{
+    margin-top: 30px;
+    background: rgb(152, 221, 142);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+#productDetails img{
+    width: 250px;
+    height: 250px;
+    object-fit: contain;
+    display: block;
+    margin: 10px auto;
+}
+</style>
+</head>
+<body>
+
+<h1> Product Store</h1>
+<div class="search-container">
+    <input type="text" id="searchBar" placeholder="Search products...">
+    <button id="searchBtn">Search</button>
+</div>
+<h2>All Products</h2>
+<div id="products"></div>
+<h2>Product Details</h2>
+<div id="productDetails">
+    <p>Click a product to see details.</p>
+</div>
+<script>
+let allProducts = [];
+
+fetch("https://dummyjson.com/products")
+.then(response => response.json())
+.then(data => {
+
+    allProducts = data.products;
+    displayProducts(allProducts);
+})
+.catch(error => {
+    console.error("Error fetching products:", error);
+});
+function displayProducts(products){
+
+    const productsContainer = document.getElementById("products");
+    productsContainer.innerHTML = "";
+
+    if(products.length === 0){
+        productsContainer.innerHTML = "<h3>No products found</h3>";
+        return;
+    }
+
+    products.forEach(product => {
+
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        card.innerHTML = `
+            <img src="${product.thumbnail}" alt="${product.title}">
+            <h3>${product.title}</h3>
+            <p class="price">$${product.price}</p>
+        `;
+
+       card.addEventListener("click", function(){
+    showProductDetails(product);
+});
+
+productsContainer.appendChild(card);
+    });
+}
+function displayFeaturedProducts(products){
+
+    const featuredContainer = document.getElementById("featuredProducts");
+    featuredContainer.innerHTML = "";
+
+    products.forEach(product => {
+
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.innerHTML = `
+            <img src="${product.thumbnail}" alt="${product.title}">
+            <h3>${product.title}</h3>
+            <p class="price">$${product.price}</p>
+        `;
+        featuredContainer.appendChild(card);
+    });
+}
+function showProductDetails(product){
+
+    document.getElementById("productDetails").innerHTML = `
+        <h3>${product.title}</h3>
+        <img src="${product.thumbnail}" alt="${product.title}">
+        <p><strong>Price:</strong> $${product.price}</p>
+        <p><strong>Rating:</strong> * ${product.rating}</p>
+        <p><strong>Category:</strong> ${product.category}</p>
+        <p><strong>Brand:</strong> ${product.brand}</p>
+        <p><strong>Description:</strong> ${product.description}</p>
+    `;
+
+    document.getElementById("productDetails")
+        .scrollIntoView({behavior:"smooth"});
+}
+function searchProducts(){
+
+    const searchValue = document
+        .getElementById("searchBar")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const filteredProducts = allProducts.filter(product =>
+        product.title.toLowerCase().includes(searchValue)
+    );
+
+    displayProducts(filteredProducts);
+}
+document.getElementById("searchBtn")
+.addEventListener("click", searchProducts);
+document.getElementById("searchBar")
+.addEventListener("keypress", function(e){
+    
+});
+
+</script>
+
+</body>
+</html>
